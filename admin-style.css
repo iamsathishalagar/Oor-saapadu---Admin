@@ -151,6 +151,13 @@ body {
   font-size: 20px;
   color: var(--primary-color);
 }
+.admin .adminone{  /*Font color edited-29-01-26*/
+  color: #ff6b35;
+}
+.admin .admintwo{  /*subname and color edited- 29-01-26*/
+  color: #5a5959;
+  font-size: small;
+}
 
 .admin-logo-icon {
   font-size: 28px;
