@@ -13,6 +13,23 @@ let editingMenuId = null;
 document.addEventListener('DOMContentLoaded', () => {
   checkAdminAuth();
   attachFormListeners();
+  renderAdminUsersTable();
+});
+// ====== ADMIN USERS TABLE ======
+function renderAdminUsersTable() {
+  const users = JSON.parse(localStorage.getItem('adminUsers')) || [];
+  const tbody = document.getElementById('adminUsersTableBody');
+  if (!tbody) return;
+  if (users.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;">No users registered yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(u => `<tr><td style='padding:6px 4px;'>${u.name}</td><td style='padding:6px 4px;'>${u.email}</td><td style='padding:6px 4px;'>${u.phone}</td></tr>`).join('');
+}
+
+// Update user table if users are added in another tab
+window.addEventListener('storage', (e) => {
+  if (e.key === 'adminUsers') renderAdminUsersTable();
 });
 
 // ====== AUTHENTICATION ======
@@ -111,80 +128,26 @@ function logout() {
 }
 
 // ====== DATA LOADING ======
+function loadFromStorage(key, defaultValue = []) {
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) ? parsed : defaultValue;
+    }
+  } catch (e) {
+    console.error(`Error loading ${key}:`, e);
+  }
+  return defaultValue;
+}
+
 function loadAdminData() {
   try {
-    // Load hotels
-    try {
-      const storedHotels = localStorage.getItem('adminHotels');
-      console.log('Stored hotels from localStorage:', storedHotels);
-      if (storedHotels) {
-        const parsed = JSON.parse(storedHotels);
-        adminHotels = Array.isArray(parsed) ? parsed : [];
-        console.log('✅ Hotels loaded:', adminHotels.length, 'hotels');
-      } else {
-        adminHotels = [];
-        console.log('ℹ️ No hotels found in localStorage');
-      }
-    } catch (e) {
-      console.error('❌ Error loading hotels:', e);
-      adminHotels = [];
-    }
-
-    // Load orders
-    try {
-      const storedOrders = localStorage.getItem('orders');
-      if (storedOrders) {
-        const parsed = JSON.parse(storedOrders);
-        adminOrders = Array.isArray(parsed) ? parsed : [];
-      } else {
-        adminOrders = [];
-      }
-    } catch (e) {
-      console.error('Error loading orders:', e);
-      adminOrders = [];
-    }
-
-    // Load donations
-    try {
-      const storedDonations = localStorage.getItem('adminDonations');
-      if (storedDonations) {
-        const parsed = JSON.parse(storedDonations);
-        adminDonations = Array.isArray(parsed) ? parsed : [];
-      } else {
-        adminDonations = [];
-      }
-    } catch (e) {
-      console.error('Error loading donations:', e);
-      adminDonations = [];
-    }
-
-    // Load reviews
-    try {
-      const storedReviews = localStorage.getItem('adminReviews');
-      if (storedReviews) {
-        const parsed = JSON.parse(storedReviews);
-        adminReviews = Array.isArray(parsed) ? parsed : [];
-      } else {
-        adminReviews = [];
-      }
-    } catch (e) {
-      console.error('Error loading reviews:', e);
-      adminReviews = [];
-    }
-
-    // Load promo codes
-    try {
-      const storedPromos = localStorage.getItem('adminPromoCodes');
-      if (storedPromos) {
-        const parsed = JSON.parse(storedPromos);
-        adminPromoCodes = Array.isArray(parsed) ? parsed : [];
-      } else {
-        adminPromoCodes = [];
-      }
-    } catch (e) {
-      console.error('Error loading promo codes:', e);
-      adminPromoCodes = [];
-    }
+    adminHotels = loadFromStorage('adminHotels');
+    adminOrders = loadFromStorage('orders');
+    adminDonations = loadFromStorage('adminDonations');
+    adminReviews = loadFromStorage('adminReviews');
+    adminPromoCodes = loadFromStorage('adminPromoCodes');
 
     // Build menu items from hotels
     adminMenuItems = [];
@@ -208,13 +171,8 @@ function loadAdminData() {
       }
     });
 
-    // Build customers list
     extractCustomersFromOrders();
-    
-    // Populate review filter
     populateReviewHotelFilter();
-
-    console.log('Admin data loaded successfully');
   } catch (error) {
     console.error('Critical error loading admin data:', error);
   }
@@ -495,7 +453,7 @@ function updateImagePreview(url) {
 }
 
 function handleHotelFormSubmit(e) {
-  console.log('🏨 Hotel form submitted!');
+
   try {
     if (!Array.isArray(adminHotels)) {
       adminHotels = [];
@@ -912,12 +870,9 @@ function updateAdminSettings() {
 // ====== DATA PERSISTENCE ======
 function saveAdminData() {
   try {
-    console.log('Saving hotels:', adminHotels);
     localStorage.setItem('adminHotels', JSON.stringify(adminHotels));
     localStorage.setItem('adminReviews', JSON.stringify(adminReviews));
     localStorage.setItem('adminPromoCodes', JSON.stringify(adminPromoCodes));
-    console.log('✅ Admin data saved successfully to localStorage');
-    console.log('Total hotels saved:', adminHotels.length);
   } catch (e) {
     console.error('❌ Error saving admin data:', e);
     alert('Error saving data: ' + e.message);
@@ -929,49 +884,9 @@ function notifyUserPanel() {
   try {
     const event = new Event('hotelsUpdated');
     window.dispatchEvent(event);
-    console.log('📢 Hotel update event dispatched to user panel');
   } catch (e) {
     console.error('Error notifying user panel:', e);
   }
-}
-
-// ====== DEBUG FUNCTIONS ======
-function debugAdmin() {
-  console.log('=== ADMIN PANEL DEBUG ===');
-  console.log('adminHotels:', adminHotels);
-  console.log('adminHotels length:', adminHotels.length);
-  console.log('localStorage adminHotels:', localStorage.getItem('adminHotels'));
-  console.log('adminOrders:', adminOrders);
-  console.log('adminDonations:', adminDonations);
-}
-
-function testAddHotel() {
-  const testHotel = {
-    id: adminHotels.length > 0 ? Math.max(...adminHotels.map(h => h.id)) + 1 : 1,
-    name: 'Test Hotel ' + Date.now(),
-    area: 'Test Area',
-    location: 'Test Location',
-    cuisine: 'Test Cuisine',
-    distance: 1.5,
-    minPrice: 50,
-    deliveryFee: 20,
-    deliveryTime: '30 min',
-    contact: '9999999999',
-    rating: 4.5,
-    reviews: 100,
-    menu: {
-      breakfast: [{ name: 'Test Item', price: 50 }],
-      lunch: [{ name: 'Test Lunch', price: 100 }],
-      snacks: [{ name: 'Test Snack', price: 30 }],
-      dinner: [{ name: 'Test Dinner', price: 80 }]
-    }
-  };
-  
-  adminHotels.push(testHotel);
-  console.log('✅ Test hotel added:', testHotel);
-  saveAdminData();
-  updateDashboard();
-  populateHotelsTable();
 }
 
 // ====== REVIEWS MANAGEMENT ======
