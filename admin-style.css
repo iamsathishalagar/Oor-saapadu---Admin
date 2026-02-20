@@ -968,7 +968,6 @@ body {
   }
 }
 
-@media (max-width: 480px) {
   .admin-nav-container {
     padding: 10px;
     flex-direction: column;
@@ -999,6 +998,102 @@ body {
   .stat-card {
     padding: 15px;
     gap: 10px;
+@media (max-width: 480px) {
+  .admin-nav-container {
+    padding: 10px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .admin-logo {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .admin-logo-icon {
+    font-size: 24px;
+  }
+
+  .admin-nav-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .admin-main {
+    padding: 10px;
+  }
+
+  .section-header h1 {
+    font-size: 20px;
+  }
+
+  .stat-card {
+    padding: 10px;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    max-height: none;
+    position: static;
+    padding: 0;
+    margin-bottom: 10px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .sidebar-menu {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar-menu li {
+    flex: 1 1 40%;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .admin-container {
+    flex-direction: column;
+    padding: 0 2px;
+  }
+
+  .admin-main {
+    width: 100%;
+    padding: 0 2px;
+  }
+
+  .modal-content {
+    width: 100%;
+    min-width: unset;
+    padding: 10px 2px;
+  }
+
+  .settings-container {
+    grid-template-columns: 1fr;
+    padding: 0 2px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-footer {
+    font-size: 12px;
+    padding: 8px 2px;
+    text-align: center;
+  }
+}
   }
 
   .stat-icon {
